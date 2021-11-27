@@ -1,32 +1,38 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <Fixed />
+    <Login v-if="!this.$store.state.islogin"/>
+    <router-view v-else></router-view>
   </div>
 </template>
 
+<script>
+import Fixed from "./components/Fixed.vue";
+import Login from './components/Login.vue'
+// import ajax from './utils/ajax'
+
+export default {
+  name: "App",
+  
+  components: {
+    Fixed,
+    Login
+    
+  },
+  // created(){
+  //   ajax('http://localhost:3000/personalized',{limit:2}).then(res=>{
+  //     console.log(res)
+  //   })
+    
+    
+  // },
+  computed: {
+    ismanager () {
+      return this.$store.state.ismanager
+    }
+  }
+};
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>
