@@ -1,25 +1,20 @@
 <template>
 
-<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-  <el-form-item label="摄像头名" prop="cameraName">
-    <el-input v-model="ruleForm.cameraName"></el-input>
-  </el-form-item>
-  <el-form-item label="摄像头别名" prop="cameraConfigName">
-    <el-input v-model="ruleForm.cameraConfigName"></el-input>
-  </el-form-item>
+<el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">
   <el-form-item label="组别" prop="cameraGroupName">
      <el-cascader
     :options="options"
     :props="props"
     clearable
-    v-model="ruleForm.cameraGroupName"></el-cascader>
+    v-model="ruleForm.cameraGroupId" 
+    :disabled="this.ruleForm.cameraGroupName!=''"></el-cascader>
   </el-form-item>
-  <el-form-item label="IP地址" prop="ip">
-    <el-input v-model="ruleForm.ip"></el-input>
+   <el-form-item label="新增组名">
+    <el-input v-model="ruleForm.cameraGroupName" :disabled="this.ruleForm.cameraGroupId!=''"></el-input>
   </el-form-item>
-  
   <el-form-item>
-    <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+    <el-button type="primary" @click="addForm('ruleForm')">立即添加</el-button>
+    <el-button type="primary" @click="deleteForm('ruleForm')">立即删除</el-button>
     <el-button @click="resetForm('ruleForm')">重置</el-button>
   </el-form-item>
 </el-form>
@@ -30,28 +25,11 @@ import ajax from '../utils/ajax'
     data() {
       return {
         ruleForm: {
-          cameraName:'',
-          cameraConfigName:'',
           cameraGroupName:'',
-          ip:'',
-          cameraGroupId:'',
-        },
-        rules: {
-          cameraName: [
-            { required: true, message: '请输入摄像头名', trigger: 'blur' },
-          ],
-          cameraConfigName: [
-            { required: true, message: '请输入摄像头别名', trigger: 'blur' }
-          ],
-          ip: [
-            { required: true, message: '请输入摄像头IP', trigger: 'blur' }
-          ],
-          cameraGroupName:[
-            { required: true, message: '请选择组别', trigger: 'blur' }
-          ]
-          
+          cameraGroupId:''
         },
         
+        props: { multiple: true },
         options: [{
           value: 1,
           label: '东南',
@@ -102,43 +80,49 @@ import ajax from '../utils/ajax'
         }]
       };
     },
+    props:['adduser'],
     created(){
       ajax('/api/cameragroup/getlist').then(res=>{
         console.log(res)
         console.log('qian',this.options)
-        this.options = res.data
-        this.options = this.options.map(v=>{return {value: v.cameraGroupId,label:v.cameraGroupName}})
-        console.log('hou',this.options)
+        // this.options = res.data
+        // this.options = this.options.map(v=>{return {value: v.cameraGroupId,label:v.cameraGroupName}})
+        // console.log('hou',this.options)
       })
     },
     methods: {
-      submitForm(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            //接口传递并再次请求刷新
-            this.ruleForm.cameraGroupId = this.ruleForm.cameraGroupName.toString()
-            ajax('/api/camera/add',this.ruleForm,'Post').then(res=>{
-            //   if(res.status==200){
-            //     alert('submit!');
-            // console.log(this.ruleForm)
+      addForm() {
+        
+          if (this.ruleForm.cameraGroupName!='') {
             
-            // this.$emit("changeTable")
-            //   }else{alert('添加失败')}
-            console.log(res)
-              alert('submit!');
-            console.log(this.ruleForm)
-            
+            ajax('/api/cameragroup/add',{cameraGroupName:this.ruleForm.cameraGroupName},'Post').then(res=>{
+              console.log(res)
+              alert('submit!');          
             this.$emit("changeTable")
             })
-
-            
             
             
           } else {
-            console.log('error submit!!');
+            alert('error submit!!');
             return false;
           }
-        });
+        
+      },
+      deleteForm() {
+        
+          if (this.ruleForm.cameraGroupId!='') {
+            ajax('/api/cameragroup/delete',{cameraGroupId:this.ruleForm.cameraGroupId},'Post').then(res=>{
+              console.log(res)
+              console.log('this.ruleForm.cameraGroupId',this.ruleForm.cameraGroupId)
+
+              alert('submit!');
+              this.$emit("changeTable")
+            })
+          } else {
+            alert('error submit!!');
+            return false;
+          }
+        
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();
@@ -155,7 +139,7 @@ import ajax from '../utils/ajax'
     background-color: aliceblue;
     left: 0;
     padding: 50px 50px 50px 50px;
-    margin-left: 10%;
+    margin-left: 40%;
     border-radius: 2%;
 }
 

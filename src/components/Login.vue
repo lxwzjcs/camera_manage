@@ -24,6 +24,7 @@
  
 <script>
 // import axios from "axios";
+import ajax from '../utils/ajax'
 export default {
   name: "login",
   data() {
@@ -35,7 +36,9 @@ export default {
       rules:{} 
     };
   },
-  created() {},
+  created() {
+    
+  },
   methods: {
     doLogin() {
       if (!this.user.username) {
@@ -45,8 +48,28 @@ export default {
         this.$message.error("请输入密码！");
         return;
       } else {
+          ajax('/api/index/login',{userAccount:this.user.username,
+          userPassword:this.user.password},'Post').then(res=>{
+            console.log(res)
+             let myName=JSON.parse(sessionStorage.getItem("role"));
+             console.log(myName)
+            // if(res.status==200){
+              this.$store.state.islogin = true
+              if(res.data.role==1){
+                this.$store.state.ismanager = true
+              }else{
+                this.$store.state.ismanager = false
+              }
+              this.$store.state.userName = res.data.userName
+              
+            // }else{
+              // alert('登录失败！')
+            // }
+            
+          }).catch(err=>{
+            alert(err.response.data.message)
+          })
           
-          this.$store.state.islogin = true
           
         //校验用户名和密码是否正确;
         // this.$router.push({ path: "/personal" });
@@ -74,9 +97,10 @@ export default {
 .login {
   position: fixed;
   top: 0;
-  left: 270px;
+  left: 180px;
   width: 80%;
   height: 100%;
+  
 }
 .login-wrap {
   background-size: cover;
@@ -86,6 +110,7 @@ export default {
   overflow: hidden;
   padding-top: 10px;
   line-height: 40px;
+  background: rgba(248, 241, 241, 0.664);
 }
 #password {
   margin-bottom: 5px;

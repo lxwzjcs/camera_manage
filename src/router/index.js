@@ -28,9 +28,9 @@ const routes = [
     component: () => import('../views/Device.vue')
   },
   {
-    path: '/Config',
-    name: 'Config',
-    component: () => import('../views/Config.vue')
+    path: '/Mission',
+    name: 'Mission',
+    component: () => import('../views/Mission.vue')
   },
   
 ]

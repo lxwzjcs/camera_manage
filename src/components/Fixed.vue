@@ -7,7 +7,7 @@
       class="el-menu-vertical"
       @open="handleOpen"
       @close="handleClose"
-      background-color="#545c64"
+      background-color="#005CA1"
       text-color="#fff"
       active-text-color="#ffd04b"
       router>
@@ -27,9 +27,9 @@
         <i class="el-icon-menu"></i>
         <span slot="title">设备管理</span>
       </el-menu-item>
-      <el-menu-item index="Config">
+      <el-menu-item index="Mission">
         <i class="el-icon-document"></i>
-        <span slot="title">配置管理</span>
+        <span slot="title">任务管理</span>
       </el-menu-item>
       
     </el-menu>
@@ -57,7 +57,10 @@
     top: 0;
     left: 0;
     width: 250px;
-    height: 100vh;
+    height: 90vh;
+    padding-top: 10vh;
+
+    
 }
 
 </style>

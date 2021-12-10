@@ -1,6 +1,7 @@
 <template>
   <div id="app">
-    <Fixed />
+    <Header v-if="this.$store.state.islogin"/>
+    <Fixed  v-if="this.$store.state.islogin"/>
     <Login v-if="!this.$store.state.islogin"/>
     <router-view v-else></router-view>
   </div>
@@ -8,7 +9,8 @@
 
 <script>
 import Fixed from "./components/Fixed.vue";
-import Login from './components/Login.vue'
+import Login from './components/Login.vue';
+import Header from './components/Header.vue'
 // import ajax from './utils/ajax'
 
 export default {
@@ -16,7 +18,8 @@ export default {
   
   components: {
     Fixed,
-    Login
+    Login,
+    Header
     
   },
   // created(){
