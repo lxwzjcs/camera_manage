@@ -2594,6 +2594,11 @@
   "resolved" "https://registry.npmmirror.com/commander/download/commander-2.20.3.tgz"
   "version" "2.20.3"
 
+"commander@^5.0.0":
+  "integrity" "sha512-P0CysNDQ7rtVw4QIQtm+MRxV66vKFSvlsQvGYXZWR3qFU0jlMKHZZZgw8e+8DSah4UDKMqnknRDQz+xuQXQ/Zg=="
+  "resolved" "https://registry.npmmirror.com/commander/download/commander-5.1.0.tgz"
+  "version" "5.1.0"
+
 "commander@~2.19.0":
   "integrity" "sha1-9hmKqE5bg8RgVLlN3tv+1e6f8So="
   "resolved" "https://registry.npmmirror.com/commander/download/commander-2.19.0.tgz"
@@ -8004,6 +8009,13 @@
   dependencies:
     "psl" "^1.1.28"
     "punycode" "^2.1.1"
+
+"tree-node-cli@^1.4.0":
+  "integrity" "sha1-j0AoVUYQ1u4c3rmFVKYIQaPPo6w="
+  "resolved" "https://registry.nlark.com/tree-node-cli/download/tree-node-cli-1.4.0.tgz"
+  "version" "1.4.0"
+  dependencies:
+    "commander" "^5.0.0"
 
 "tryer@^1.0.1":
   "integrity" "sha1-8shUBoALmw90yfdGW4HqrSQSUvg="

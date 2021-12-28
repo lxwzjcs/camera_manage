@@ -16,6 +16,7 @@
     <el-button type="primary" @click="addForm('ruleForm')">立即添加</el-button>
     <el-button type="primary" @click="deleteForm('ruleForm')">立即删除</el-button>
     <el-button @click="resetForm('ruleForm')">重置</el-button>
+    <el-button @click="quit">取消</el-button>
   </el-form-item>
 </el-form>
 </template>
@@ -83,27 +84,41 @@ import ajax from '../utils/ajax'
     props:['adduser'],
     created(){
       ajax('/api/cameragroup/getlist').then(res=>{
-        console.log(res)
-        console.log('qian',this.options)
-        // this.options = res.data
-        // this.options = this.options.map(v=>{return {value: v.cameraGroupId,label:v.cameraGroupName}})
+        // console.log(res)
+        // console.log('qian',this.options)
+        this.options = res.data
+        this.options = this.options.map(v=>{return {value: v.cameraGroupId,label:v.cameraGroupName}})
         // console.log('hou',this.options)
       })
     },
     methods: {
+      quit(){
+            this.$emit("changeTable")
+        },
       addForm() {
         
           if (this.ruleForm.cameraGroupName!='') {
             
-            ajax('/api/cameragroup/add',{cameraGroupName:this.ruleForm.cameraGroupName},'Post').then(res=>{
-              console.log(res)
-              alert('submit!');          
+            ajax('/api/cameragroup/add',{cameraGroupName:this.ruleForm.cameraGroupName},'Post').then(()=>{
+              // console.log(res)
+              this.$message({
+        type:'success',
+        message:'新增成功'
+      })        
             this.$emit("changeTable")
+            }).catch(()=>{
+              this.$message({
+                type:'error',
+                message:'新增失败'
+              })
             })
             
             
           } else {
-            alert('error submit!!');
+            this.$message({
+        type:'error',
+        message:'新增失败'
+      })
             return false;
           }
         
@@ -112,14 +127,25 @@ import ajax from '../utils/ajax'
         
           if (this.ruleForm.cameraGroupId!='') {
             ajax('/api/cameragroup/delete',{cameraGroupId:this.ruleForm.cameraGroupId},'Post').then(res=>{
-              console.log(res)
+              // console.log(res)
               console.log('this.ruleForm.cameraGroupId',this.ruleForm.cameraGroupId)
 
-              alert('submit!');
+              this.$message({
+        type:'success',
+        message:'删除成功'
+      })
               this.$emit("changeTable")
+            }).catch(()=>{
+              this.$message({
+                type:'error',
+                message:'删除失败'
+              })
             })
           } else {
-            alert('error submit!!');
+            this.$message({
+        type:'error',
+        message:'删除失败'
+      })
             return false;
           }
         
@@ -142,5 +168,10 @@ import ajax from '../utils/ajax'
     margin-left: 40%;
     border-radius: 2%;
 }
-
+.el-input{
+  width: 260px;
+}
+.el-select{
+  width: 260px;
+}
 </style>

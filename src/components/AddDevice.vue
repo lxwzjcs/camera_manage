@@ -17,10 +17,13 @@
   <el-form-item label="IP地址" prop="ip">
     <el-input v-model="ruleForm.ip"></el-input>
   </el-form-item>
-  
+  <el-form-item label="rtsp" prop="rtsp">
+    <el-input v-model="ruleForm.rtsp" type="textarea"></el-input>
+  </el-form-item>
   <el-form-item>
     <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
     <el-button @click="resetForm('ruleForm')">重置</el-button>
+    <el-button @click="quit">取消</el-button>
   </el-form-item>
 </el-form>
 </template>
@@ -35,6 +38,7 @@ import ajax from '../utils/ajax'
           cameraGroupName:'',
           ip:'',
           cameraGroupId:'',
+          rtsp:'',
         },
         rules: {
           cameraName: [
@@ -48,7 +52,10 @@ import ajax from '../utils/ajax'
           ],
           cameraGroupName:[
             { required: true, message: '请选择组别', trigger: 'blur' }
-          ]
+          ],
+          rtsp:[
+            { required: true, message: '请输入rtsp', trigger: 'blur' }
+          ],
           
         },
         
@@ -104,38 +111,49 @@ import ajax from '../utils/ajax'
     },
     created(){
       ajax('/api/cameragroup/getlist').then(res=>{
-        console.log(res)
-        console.log('qian',this.options)
+        // console.log(res)
+        // console.log('qian',this.options)
         this.options = res.data
         this.options = this.options.map(v=>{return {value: v.cameraGroupId,label:v.cameraGroupName}})
-        console.log('hou',this.options)
+        // console.log('hou',this.options)
       })
     },
     methods: {
+      quit(){
+            this.$emit("changeTable")
+        },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             //接口传递并再次请求刷新
             this.ruleForm.cameraGroupId = this.ruleForm.cameraGroupName.toString()
-            ajax('/api/camera/add',this.ruleForm,'Post').then(res=>{
+            ajax('/api/camera/add',this.ruleForm,'Post').then(()=>{
             //   if(res.status==200){
             //     alert('submit!');
             // console.log(this.ruleForm)
             
             // this.$emit("changeTable")
             //   }else{alert('添加失败')}
-            console.log(res)
-              alert('submit!');
-            console.log(this.ruleForm)
+            // console.log(res)
+             this.$message({
+        type:'success',
+        message:'新增成功'
+      })
+            // console.log(this.ruleForm)
             
             this.$emit("changeTable")
+            }).catch(()=>{
+              this.$message({
+                type:'error',
+                message:'新增失败'
+              })
             })
 
             
             
             
           } else {
-            console.log('error submit!!');
+            // console.log('error submit!!');
             return false;
           }
         });
@@ -147,16 +165,21 @@ import ajax from '../utils/ajax'
   }
 </script>
 
-<style>
+<style scoped>
 .demo-ruleForm{
     position: fixed;
     top: 15vh;
     z-index: 300;
     background-color: aliceblue;
-    left: 0;
+    left: 40%;
     padding: 50px 50px 50px 50px;
-    margin-left: 10%;
+    margin-left: 0;
     border-radius: 2%;
 }
-
+.el-input{
+  width: 260px;
+}
+.el-select{
+  width: 260px;
+}
 </style>

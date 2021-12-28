@@ -4,10 +4,10 @@
     :rules="rules"
     ref="ruleForm"
     label-width="100px"
-    class="demo-ruleForm"
+    class="demo-ruleForm6"
   >
     <el-form-item label="摄像头名" prop="cameraName">
-      <el-input v-model="ruleForm.cameraName"></el-input>
+      <el-input v-model="ruleForm.cameraName" disabled></el-input>
     </el-form-item>
     <el-form-item label="摄像头号" prop="cameraId">
       <el-input v-model="ruleForm.cameraId" disabled></el-input>
@@ -16,15 +16,22 @@
       <el-input v-model="ruleForm.cameraConfigName"></el-input>
     </el-form-item>
     <el-form-item label="组别" prop="cameraGroupName">
-      <el-cascader
+      <el-select v-model="ruleForm.cameraGroupId" placeholder="请选择组别">
+      <el-option :label="item.label" :value="item.value" v-for="item in options" :key="item.value"></el-option>
+      
+    </el-select>
+      <!-- <el-cascader
         :options="options"
         :props="props"
         clearable
         v-model="ruleForm.cameraGroupName"
-      ></el-cascader>
+      ></el-cascader> -->
     </el-form-item>
     <el-form-item label="IP地址" prop="ip">
       <el-input v-model="ruleForm.ip"></el-input>
+    </el-form-item>
+    <el-form-item label="rtsp" prop="rtsp">
+      <el-input v-model="ruleForm.rtsp" type="textarea"></el-input>
     </el-form-item>
 
     <el-form-item>
@@ -32,6 +39,7 @@
         >立即修改</el-button
       >
       <el-button @click="resetForm('ruleForm')">重置</el-button>
+      <el-button @click="quit">取消</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -42,17 +50,23 @@ export default {
     return {
       ruleForm: this.changerow,
       rules: {
-        camera_name: [
+        cameraId: [
           { required: true, message: "请输入摄像头名", trigger: "blur" },
         ],
-        camera_othername: [
+        cameraName: [
+          { required: true, message: "请输入摄像头名", trigger: "blur" },
+        ],
+        cameraConfigName: [
           { required: true, message: "请输入摄像头别名", trigger: "blur" },
         ],
-        camera_ip: [
+        ip: [
           { required: true, message: "请输入摄像头IP", trigger: "blur" },
         ],
-        camera_group: [
+        cameraGroupName: [
           { required: true, message: "请选择组别", trigger: "blur" },
+        ],
+        rtsp:[
+          { required: true, message: "请输入rtsp", trigger: "blur" },
         ],
       },
       
@@ -117,37 +131,48 @@ export default {
   },
   created(){
     ajax('/api/cameragroup/getlist').then(res=>{
-        console.log(res)
-        console.log('qian',this.options)
+        // console.log(res)
+        // console.log('qian',this.options)
         this.options = res.data
         this.options = this.options.map(v=>{return {value: v.cameraGroupId,label:v.cameraGroupName}})
-        console.log('hou',this.options)
+        // console.log('hou',this.options)
       })
   },
   props: ["changerow"],
   methods: {
+    quit(){
+            this.$emit("changeTable")
+        },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.ruleForm.cameraGroupId = this.ruleForm.cameraGroupName.toString()
-          ajax('/api/camera/update',this.ruleForm,'Post').then(res=>{
+          // console.log(this.ruleForm)
+          ajax('/api/camera/update',this.ruleForm,'Post').then(()=>{
             //   if(res.status==200){
             //     alert('submit!');
             // console.log(this.ruleForm)
             
             // this.$emit("changeTable")
             //   }else{alert('添加失败')}
-            console.log(res)
-              alert('submit!');
-            console.log(this.ruleForm)
+            // console.log(res)
+              this.$message({
+        type:'success',
+        message:'修改成功'
+      })
+            // console.log(this.ruleForm)
             
             this.$emit("changeTable")
+            }).catch(()=>{
+              this.$message({
+                type:'error',
+                message:'修改失败'
+              })
             })
           
           
 
         } else {
-          console.log("error submit!!");
+          // console.log("error submit!!");
           return false;
         }
       });
@@ -159,8 +184,8 @@ export default {
 };
 </script>
 
-<style>
-.demo-ruleForm {
+<style scoped>
+.demo-ruleForm6 {
   position: fixed;
   top: 15vh;
   z-index: 300;
@@ -170,4 +195,11 @@ export default {
 
   border-radius: 2%;
 }
+.el-input{
+  width: 260px;
+}
+.el-select{
+  width: 260px;
+}
+
 </style>

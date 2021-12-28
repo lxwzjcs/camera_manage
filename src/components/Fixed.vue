@@ -40,17 +40,12 @@
   export default {
       
     methods: {
-      handleOpen(key, keyPath) {
-        console.log(key, keyPath);
-      },
-      handleClose(key, keyPath) {
-        console.log(key, keyPath);
-      }
+      
     }
   }
 </script>
 
-<style>
+<style scoped>
 
 .el-menu-vertical{
     position: fixed;
@@ -62,5 +57,10 @@
 
     
 }
-
+.el-input{
+  width: 260px;
+}
+.el-select{
+  width: 260px;
+}
 </style>

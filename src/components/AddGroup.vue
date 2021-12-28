@@ -37,25 +37,30 @@ import ajax from '../utils/ajax'
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            ajax('/api/cameragroup/add',this.ruleForm,'Post').then(res=>{
+            ajax('/api/cameragroup/add',this.ruleForm,'Post').then(()=>{
             //   if(res.status==200){
             //     alert('submit!');
             // console.log(this.ruleForm)
             
             // this.$emit("changeTable")
             //   }else{alert('添加失败')}
-            console.log(res)
-              alert('submit!');
-            console.log(this.ruleForm)
+            // console.log(res)
+              this.$message({
+        type:'success',
+        message:'新增成功'
+      })
+            // console.log(this.ruleForm)
             
             this.$emit("changeTable")
+            }).catch(()=>{
+              this.$message({
+                type:'error',
+                message:'新增失败'
+              })
             })
             
             
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
+          } 
         });
       },
       resetForm(formName) {
@@ -76,5 +81,10 @@ import ajax from '../utils/ajax'
     margin-left: 40% ;
     border-radius: 2%;
 }
-
+.el-input{
+  width: 260px;
+}
+.el-select{
+  width: 260px;
+}
 </style>

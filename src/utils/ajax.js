@@ -1,5 +1,6 @@
 import axios from 'axios'
 axios.defaults.withCredentials = true
+import GL from '../components/Global'
 
 export default function ajax(url, data = {}, type = 'Get') {
     return new Promise((resolve, reject) => {
@@ -13,15 +14,15 @@ export default function ajax(url, data = {}, type = 'Get') {
                 dataStr = dataStr.substring(0, dataStr.lastIndexOf('&'))
                 url = url + '?' + dataStr
             }
-            promise = axios.get('http://192.168.1.218:8080'+url,{headers:{'Content-Type':'	application/json'}})
+            promise = axios.get(GL.baseUrl + url, { headers: { 'Content-Type': '	application/json' } })
         } else {
-            promise = axios.post('http://192.168.1.218:8080'+url, data,{headers:{'Content-Type':'	application/json'}})
+            promise = axios.post(GL.baseUrl + url, data, { headers: { 'Content-Type': '	application/json' } })
         }
         promise.then(res => {
             resolve(res.data)
         }).catch(err => {
-                reject(err)
-            })
+            reject(err)
+        })
     })
 
 }

@@ -2,27 +2,19 @@
   <div class="User-table">
     <div class="set">
       <div class="elsearch">
-        <el-input
-          placeholder="请输入内容"
-          v-model="userName"
-          
-        >
+        <el-input placeholder="请输入内容" v-model="userName">
           <template slot="prepend">用户名</template>
         </el-input>
       </div>
-      <div class="search elsearch">
-        <el-select
-          placeholder="请选择权限"
-          v-model="role"
-        >
-          <el-option label="普通用户" value="0"></el-option>
-          <el-option label="管理员" value="1"></el-option>
-        </el-select>
+      <div class="search">
+        <el-input placeholder="请输入内容" v-model="userAccount">
+          <template slot="prepend">账号</template>
+        </el-input>
       </div>
       <el-button icon="el-icon-search" circle @click="handleSearch"></el-button>
       <el-button type="success" round @click="handleReset">重置</el-button>
     </div>
-    <hr>
+    <hr />
 
     <el-button
       type="danger"
@@ -47,7 +39,7 @@
         changeuser = false;
       "
     ></div>
-    <AddUser v-if="adduser" @changeTable="changeTable" />
+    <AddUser v-if="adduser" @changeTable="changeTable" :user="user" />
     <ChangeUser
       v-if="changeuser"
       :changerow="changerow"
@@ -56,13 +48,10 @@
 
     <el-table :data="tableData" border class="usertable" ref="multipleTable">
       <el-table-column type="selection" width="55" fixed> </el-table-column>
-      <el-table-column prop="userName" label="用户名" >
-      </el-table-column>
-      <el-table-column prop="userAccount" label="账号" >
-      </el-table-column>
+      <el-table-column prop="userName" label="用户名"> </el-table-column>
+      <el-table-column prop="userAccount" label="账号"> </el-table-column>
       <el-table-column prop="role" label="权限"> </el-table-column>
-      <el-table-column prop="createTime" label="创建时间">
-      </el-table-column>
+      <el-table-column prop="createTime" label="创建时间"> </el-table-column>
       <el-table-column
         fixed="right"
         label="操作"
@@ -71,10 +60,10 @@
         :key="2"
       >
         <template slot-scope="scope">
-          <el-button @click="handleClick(scope.row)"  size="small" round
+          <el-button @click="handleClick(scope.row)" size="small" round
             >修改</el-button
           >
-          <el-button  size="small" @click="deleteRow(scope.row)" round
+          <el-button size="small" @click="deleteRow(scope.row)" round
             >删除</el-button
           >
         </template>
@@ -114,38 +103,50 @@ export default {
         type: "warning",
       }).then(() => {
         //接口删除
-        ajax("/api/user/delete", { userId: row.userId }, "Post").then((res) => {
-          // if(res.status == 200){}else{}
-          console.log(res);
-          const newreset = this.reset.filter((obj) => {
-            console.log(row.userAccount);
-            return obj.userAccount !== row.userAccount;
+        ajax("/api/user/delete", { userId: row.userId }, "Post")
+          .then(() => {
+            // if(res.status == 200){}else{}
+            // console.log(res);
+            const newreset = this.reset.filter((obj) => {
+              // console.log(row.userAccount);
+              return obj.userAccount !== row.userAccount;
+            });
+            this.tableData = newreset;
+            this.reset = newreset;
+            this.$message({
+              type: "success",
+              message: "删除成功",
+            });
+          })
+          .catch(() => {
+            this.$message({
+              type: "error",
+              message: "删除失败",
+            });
           });
-          this.tableData = newreset;
-          this.reset = newreset;
-        });
       });
     },
 
     //搜索
     handleSearch() {
       // if (this.userName) {
-        this.search = {
-          userName:this.userName,
-          role:this.role
-        }
-        
-        ajax(
-          "/api/user/search",
-          { type: 2, information: this.search },
-          "Post"
-        ).then((res) => {
-          console.log(res);
-          this.tableData = res.data;
-          console.log("this.tableData", this.tableData);
-          this.reset = this.tableData;
-          this.total1 = this.reset.length;
-        });
+      this.search = {
+        userName: this.userName,
+        userAccount: this.userAccount,
+        role: "3",
+      };
+
+      ajax(
+        "/api/user/search",
+        { type: 2, information: this.search },
+        "Post"
+      ).then((res) => {
+        // console.log(res);
+        this.tableData = res.data;
+        // console.log("this.tableData", this.tableData);
+        this.reset = this.tableData;
+        this.total1 = this.reset.length;
+      });
       // } else if (this.role) {
       //   ajax(
       //     "/api/user/search",
@@ -169,9 +170,31 @@ export default {
       this.role = "";
     },
 
+    //切换弹窗状态
     changeTable() {
       this.adduser = false;
       this.changeuser = false;
+      ajax("/api/user/getlist").then((res) => {
+        // console.log(res);
+        this.tableData = res.data.filter((v) => {
+          return v.role == "3";
+        });
+        this.tableData.map((v) => {
+          if (v.role == "1") {
+            return (v.role = "管理员");
+          } else if (v.role == "3") {
+            return (v.role = "普通用户");
+          }
+        });
+        // console.log("this.tableData", this.tableData);
+        this.reset = this.tableData;
+        this.total1 = this.reset.length;
+      });
+
+      this.tableData = this.tableData.slice(
+        (this.currentPage1 - 1) * this.pageSize,
+        this.currentPage1 * this.pageSize
+      );
     },
 
     //批量删除
@@ -182,26 +205,33 @@ export default {
         type: "warning",
       }).then(() => {
         //接口删除
-        console.log('delete',this.$refs.multipleTable.selection);
+        // console.log('delete',this.$refs.multipleTable.selection);
         const deletelist = this.$refs.multipleTable.selection;
         for (let i = 0; i < deletelist.length; i++) {
-          ajax(
-            "/api/user/delete",
-            { userId: deletelist[i].userId },
-            "Post"
-          ).then((res) => {
-            console.log(res);
-            if (res.status == 200) {
+          ajax("/api/user/delete", { userId: deletelist[i].userId }, "Post")
+            .then(() => {
+              // console.log(res);
+              // if (res.status == 200) {
               const newreset = this.reset.filter((obj) => {
-                console.log(deletelist[i].userAccount);
+                // console.log(deletelist[i].userAccount);
                 return obj.userAccount !== deletelist[i].userAccount;
               });
               this.tableData = newreset;
               this.reset = newreset;
-            } else {
-              alert("删除失败!");
-            }
-          });
+              this.$message({
+                type: "success",
+                message: "删除成功",
+              });
+              // } else {
+              //   alert("删除失败!");
+              // }
+            })
+            .catch(() => {
+              this.$message({
+                type: "error",
+                message: "删除失败",
+              });
+            });
         }
       });
     },
@@ -211,6 +241,7 @@ export default {
       this.currentPage1 = currentPage;
       this.currentChangePage(this.reset, currentPage);
     },
+
     //分页方法（重点）
     currentChangePage(list, currentPage) {
       let from = (currentPage - 1) * this.pageSize;
@@ -230,11 +261,20 @@ export default {
   },
 
   created() {
-    
     ajax("/api/user/getlist").then((res) => {
-      console.log(res);
-      this.tableData = res.data.filter(v=>{return v.role=='0'});
-      console.log("this.tableData", this.tableData);
+      // console.log(res);
+      this.tableData = res.data.filter((v) => {
+        return v.role == "3";
+      });
+
+      this.tableData.map((v) => {
+        if (v.role == "1") {
+          return (v.role = "管理员");
+        } else if (v.role == "3") {
+          return (v.role = "普通用户");
+        }
+      });
+      // console.log("this.tableData", this.tableData);
       this.reset = this.tableData;
       this.total1 = this.reset.length;
     });
@@ -247,14 +287,23 @@ export default {
 
   updated() {
     this.total1 = this.reset.length;
+    this.tableData.map((v) => {
+      if (v.role == "1") {
+        return (v.role = "管理员");
+      } else if (v.role == "3") {
+        return (v.role = "普通用户");
+      }
+    });
   },
 
   data() {
     return {
-      search:{},
+      user: true,
+      search: {},
       changerow: {},
       changeuser: false,
       userName: "",
+      userAccount: "",
       role: "",
       adduser: false,
       reset: [],
@@ -424,8 +473,7 @@ export default {
 };
 </script>
 
-<style>
-
+<style scoped>
 .dialog-cover {
   background: rgba(0, 0, 0, 0.8);
   position: fixed;
@@ -462,11 +510,26 @@ export default {
   margin-right: 30px;
 }
 
-.el-table .cell {
-  height: 32px;
+.elsearch .el-input-group__prepend {
+  width: 56px;
 }
 
+.elsearch .el-input__inner {
+  width: 206px;
+}
 
+.el-table .cell {
+  height: 32px;
+  text-align: center;
+}
+
+.justchoose3 .el-input__inner {
+  width: 275px;
+}
+
+.justchoose3 .el-select {
+  width: 275px;
+}
 
 .User-table {
   position: fixed;

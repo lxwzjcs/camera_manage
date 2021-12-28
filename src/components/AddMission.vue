@@ -1,15 +1,15 @@
 <template>
 
-<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm4">
   <el-form-item label="任务类别" prop="taskType">
     <el-select v-model="ruleForm.taskType" placeholder="请选择任务类别">
-      <el-option :label="item" :value="item" v-for="item in type" :key="item"></el-option>
+      <el-option :label="item" :value="i+1" v-for="(item,i) in this.GL.type" :key="item"></el-option>
       
     </el-select>
   </el-form-item>
   <el-form-item label="显卡号" prop="gpuId">
     <el-select v-model="ruleForm.gpuId" placeholder="请选择显卡号">
-      <el-option :label="item" :value="item" v-for="item in gpu" :key="item"></el-option>
+      <el-option :label="item" :value="item" v-for="item in this.GL.gpu" :key="item"></el-option>
     </el-select>
   </el-form-item>
   <el-form-item label="摄像头" prop="mission_camera">
@@ -24,12 +24,19 @@
   </el-form-item>
   <el-form-item label="采样间隔" prop="dropFrameInterval">
     <el-select v-model="ruleForm.dropFrameInterval" placeholder="请选择采样间隔">
-      <el-option :label="item" :value="item" v-for="item in dropFrameInterval" :key="item"></el-option>
+      <el-option :label="item" :value="item" v-for="item in this.GL.dropFrameInterval" :key="item"></el-option>
+      </el-select>
+  </el-form-item>
+  <el-form-item label="截图开关" prop="isScreenshot">
+    <el-select v-model="ruleForm.isScreenshot" placeholder="请选择截图开关">
+      <el-option label="是" value="1"></el-option>
+      <el-option label="否" value="0"></el-option>
       </el-select>
   </el-form-item>
   <el-form-item>
     <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
     <el-button @click="resetForm('ruleForm')">重置</el-button>
+    <el-button @click="quit">取消</el-button>
   </el-form-item>
 </el-form>
 </template>
@@ -38,15 +45,14 @@ import ajax from '../utils/ajax'
   export default {
     data() {
       return {
-        type:['aaa','bbb','ccc'],
-        gpu:['111','222','333','444'],
-        dropFrameInterval:['5','10','15','20'],
+        
         ruleForm: {
           taskType:'',
           cameraId:'',
           gpuId:'',
           mission_camera:{},
           dropFrameInterval:'',
+          isScreenshot:'',
         },
         rules: {
           taskType: [
@@ -61,7 +67,11 @@ import ajax from '../utils/ajax'
           ],
 
           dropFrameInterval:[
-            { required: true }
+            { required: true ,message: '请选择采样间隔'}
+          ],
+
+          isScreenshot:[
+            { required: true,message: '请选择截图开关'}
           ]
           
           
@@ -97,33 +107,44 @@ import ajax from '../utils/ajax'
       };
     },
     methods: {
+      quit(){
+            this.$emit("changeTable")
+        },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
 
             this.ruleForm.cameraId = this.cameraId.split(',')
-            console.log(this.ruleForm.cameraId)
-            ajax('/api/task/add',this.ruleForm,'Post').then(res=>{
+            // console.log(this.ruleForm.cameraId)
+            ajax('/api/task/add',this.ruleForm,'Post').then(()=>{
             //   if(res.status==200){
             //     alert('submit!');
             // console.log(this.ruleForm)
             
             // this.$emit("changeTable")
             //   }else{alert('添加失败')}
-            console.log(res)
-              alert('submit!');
-            console.log(this.ruleForm)
+            // console.log(res)
+              this.$message({
+        type:'success',
+        message:'新增成功'
+      })
+            // console.log(this.ruleForm)
             
             this.$emit("changeTable")
-            }).catch(err=>{
-              alert(err.response.data.message)
+            }).catch((err)=>{
+              this.$message({
+                type:'error',
+                message:err.response.data.message
+              })
             })
+              
+            
             
             
             
             
           } else {
-            console.log('error submit!!');
+            // console.log('error submit!!');
             return false;
           }
         });
@@ -151,14 +172,14 @@ import ajax from '../utils/ajax'
     created(){
       //接口请求摄像头组
       ajax('/api/cameragroup/getlist').then(res=>{
-        console.log(res)
-        console.log('qian',this.options)
+        // console.log(res)
+        // console.log('qian',this.options)
         this.options = res.data
         this.options = this.options.map(v=>{return {value: v.cameraGroupId,label:v.cameraGroupName,children: v.cameraList}})
         this.options = this.options.map(v=> { v.children = v.children.map(x=>{return {value: x.cameraId,label: x.cameraName}})
         return v})
         
-        console.log('hou',this.options)
+        // console.log('hou',this.options)
       })
 
       //接口请求任务类型和显卡号
@@ -166,16 +187,26 @@ import ajax from '../utils/ajax'
   }
 </script>
 
-<style>
-.demo-ruleForm{
+<style scoped>
+.demo-ruleForm4{
     position: fixed;
     top: 15vh;
     z-index: 300;
     background-color: aliceblue;
-    left: 0;
+    left: 40%;
     padding: 50px 50px 50px 50px;
     
     border-radius: 2%;
 }
+.el-input{
+  width: 260px;
+}
+.el-select{
+  width: 260px;
+}
 
+.el-cascader{
+    width: 260px;
+
+}
 </style>

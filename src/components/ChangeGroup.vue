@@ -6,6 +6,9 @@
     label-width="100px"
     class="demo-ruleForm1"
   >
+  <el-form-item label="组号" prop="cameraGroupId">
+      <el-input v-model="ruleForm.cameraGroupId" disabled></el-input>
+    </el-form-item>
     <el-form-item label="组名" prop="cameraGroupName">
       <el-input v-model="ruleForm.cameraGroupName"></el-input>
     </el-form-item>
@@ -45,21 +48,29 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          ajax('/api/cameragroup/update',this.ruleForm,'Post').then(res=>{
+          ajax('/api/cameragroup/update',this.ruleForm,'Post').then(()=>{
             //   if(res.status==200){
             //     alert('submit!');
             // console.log(this.ruleForm)
             
             // this.$emit("changeTable")
             //   }else{alert('添加失败')}
-            console.log(res)
-              alert('submit!');
+            // console.log(res)
+              this.$message({
+        type:'success',
+        message:'修改成功'
+      })
             
             
             this.$emit("changeTable")
+            }).catch(()=>{
+              this.$message({
+                type:'error',
+                message:'修改失败'
+              })
             })
         } else {
-          console.log("error submit!!");
+          // console.log("error submit!!");
           return false;
         }
       });
@@ -81,5 +92,11 @@ export default {
     padding: 50px 50px 50px 50px;
     margin-left: 40% ;
     border-radius: 2%;
+}
+.el-input{
+  width: 260px;
+}
+.el-select{
+  width: 260px;
 }
 </style>

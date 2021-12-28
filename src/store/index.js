@@ -8,7 +8,7 @@ export default new Vuex.Store({
     islogin:true,
     ismanager:true,
     issuper:false,
-    userName:'',
+    userName:'李四',
   },
   mutations: {
   },
